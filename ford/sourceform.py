@@ -474,6 +474,18 @@ class FortranBase(object):
                 for item in getattr(self, arg):
                     yield item
 
+    def summary(self, tab=''):
+        tab=tab+'  '
+        attrs = vars(self)
+        # now dump this in some way or another
+        print(tab+'SourceFile '+self.name)
+        for item in attrs.items():
+            if (item[0] in ['programs','modules']):
+                print(tab+"%s: %s" % item)
+            if (item[0] in ['submodules','functions','subroutines','interfaces','absinterfaces','types']):
+                print(tab+"%s: %s" % item)
+                for smod in item[1]:
+                    smod.summary(tab=tab)
 
 class FortranContainer(FortranBase):
     """
@@ -1154,6 +1166,9 @@ class FortranSubmodule(FortranModule):
         self.ancestor = line.group(2)
         self.ancestor_mod = line.group(1)
         self.modprocedures = []
+        self.modfunctions = []
+        self.modsubroutines = []
+        self.deplist = {}
         del self.public_list
         del self.private_list
         del self.protected_list
